@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dotenv environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# build output (React)
+dist/
+build/
+
+# Vite
+.vite/
+
+# Cache
+.cache/
+.temp/
+*.cache
+
+# IDE folders
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
