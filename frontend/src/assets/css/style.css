@@ -1,0 +1,261 @@
+:root {
+    --primary-color: #1F4339;
+    --secondary-color: #B2856E;
+    --background-color: #FEFEF2;
+    --white: #fff;
+    --black: #000;
+    --text-color: #ccc;
+}
+
+body {
+    padding: 0px !important;
+    margin: 0px !important;
+    background-color: var(--background-color) !important;
+}
+
+
+/* =====================header======================== */
+/* NAV LINKS */
+.nav-link {
+    position: relative;
+    font-weight: 500;
+    color: var(--black) !important;
+    transition: .2s ease;
+}
+
+.custom-navbar {
+    background-color: var(--background-color) !;
+}
+
+/* hover text color */
+.nav-link:hover {
+    color: var(--secondary-color) !important;
+}
+
+/* underline effect using var */
+.nav-link::before {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background: var(--primary-color);
+    transition: width .3s ease;
+}
+
+.nav-link:hover::before {
+    width: 100%;
+}
+
+/* ACTIVE link style */
+.nav-link.active-link {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+.nav-link.active-link::before {
+    width: 100%;
+}
+
+/* DROPDOWN colors */
+.dropdown-menu {
+    animation: fadePopup .3s ease;
+    background-color: var(--white);
+    border: 1px solid var(--secondary-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+}
+
+/* LOGO HOVER uses brand colors */
+.logo-img:hover {
+    transform: scale(1.05);
+    filter: hue-rotate(10deg) brightness(1.2);
+}
+
+.contact-box {
+    border-top: 1px solid var(--secondary-color);
+    padding-top: 15px;
+}
+
+.contact-box h5 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    animation: fadePopup .5s ease;
+}
+
+.contact-box p {
+    margin: 3px 0;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-toggler {
+    border: none !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none !important;
+}
+
+/* hide contact-box on desktop */
+.contact-box {
+    display: none;
+}
+
+/* SEARCH */
+.search-input {
+    border-radius: 25px 0 0 25px;
+    border: 1px solid var(--secondary-color);
+}
+
+.search-btn {
+    border-radius: 0 25px 25px 0;
+    border: none;
+    background: var(--secondary-color);
+    color: white;
+    padding: 8px 15px;
+}
+
+.search-btn:hover {
+    background: var(--primary-color);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper {
+    width: 30%;
+}
+
+.search-input:focus {
+    box-shadow: none !important;
+    border-color: var(--primary-color) !important;
+
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.search-input {
+    border-radius: 30px 0 0 30px;
+    border: 1px solid var(--secondary-color);
+    padding: 10px 15px;
+    font-size: 14px;
+    transition: all .3s ease;
+}
+
+/* Focus animation */
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(31, 67, 57, 0.4);
+}
+
+
+/* Search button */
+.search-btn {
+    border-radius: 0 30px 30px 0;
+    border: none;
+    background: var(--secondary-color);
+    color: #fff;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s ease;
+}
+
+/* Button hover */
+.search-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+
+
+/* ===============================footer============================ */
+.custom-footer {
+    width: 100%;
+    background: var(--background-color);
+    padding: 15px;
+    text-align: center;
+    position: relative;
+    font-size: 14px;
+    margin-top: 50px;
+    color: var(--black);
+}
+
+.custom-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(to right,
+            rgba(31, 67, 57, 0),
+            var(--primary-color),
+            var(--secondary-color),
+            var(--primary-color),
+            rgba(31, 67, 57, 0)
+        );
+}
+
+
+/* author part */
+.footer-author {
+    margin-left: 5px;
+    font-weight: 600;
+    color: var(--primary-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: .3s;
+    position: relative;
+}
+
+/* hover underline using after effect */
+.footer-author::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 1px;
+    width: 0%;
+    background: var(--secondary-color);
+    transition: .3s ease;
+}
+
+/* hover effect */
+.footer-author:hover {
+    color: var(--secondary-color);
+}
+
+.footer-author:hover::after {
+    width: 100%;
+}
+
+/* hover icon */
+.footer-author:hover svg {
+    transform: rotate(10deg);
+    transition: .3s ease;
+}
