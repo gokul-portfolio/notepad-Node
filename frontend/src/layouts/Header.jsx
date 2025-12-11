@@ -4,6 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Form from "react-bootstrap/Form";
+import { Link } from "react-router-dom";
 
 import {
     FaChevronDown,
@@ -53,8 +54,10 @@ function NavigationBar() {
                         <Offcanvas.Body>
                             <Nav className="justify-content-end flex-grow-1 pe-3">
 
-                                <Nav.Link href="#home">Home</Nav.Link>
-                                <Nav.Link href="#features">Features</Nav.Link>
+                                <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+                                <Nav.Link as={Link} to="/notes">Notes</Nav.Link>
+                                <Nav.Link as={Link} to="/signin">Sign in</Nav.Link>
+                                <Nav.Link as={Link} to="/signup">Sign up</Nav.Link>
 
                                 {/* DROPDOWN */}
                                 <NavDropdown
