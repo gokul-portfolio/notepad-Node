@@ -31,7 +31,7 @@ const Sidebar = () => {
       <div className="sidebar-header">
 
         <NavLink to="/dashboard" className="sidebar-link">
-          {isOpen && <img src={Logo} classNameimg-fluid />}
+          {isOpen && <img src={Logo} className="img-fluid" />}
         </NavLink>
 
 

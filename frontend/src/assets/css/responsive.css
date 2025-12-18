@@ -1,3 +1,12 @@
+@media screen and (max-width: 1600px) {}
+
+@media screen and (max-width: 1440px) {}
+
+@media screen and (max-width: 1199px) {}
+
+@media screen and (max-width: 991px) {}
+
+
 @media screen and (max-width: 768px) {
 
 
@@ -5,4 +14,16 @@
         display: block;
     }
 
+    .dashboard-section {
+        padding: 10px 5px;
+        min-height: 100vh;
+    }
+
+}
+
+
+@media screen and (max-width: 575px) {
+    .main-wrap {
+        padding: 10px 5px;
+    }
 }

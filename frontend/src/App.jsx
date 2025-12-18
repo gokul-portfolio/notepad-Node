@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Notes from "./pages/Notes";
 import MainLayout from "./layouts/MainLayout";
+import CreateNotes from "./pages/CreateNotes";
 import PageNotFound from "./pages/PageNotFound";
 
 const App = () => {
@@ -17,11 +18,12 @@ const App = () => {
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
 
-      {/* Pages WITH Header/Footer/Sidebar using MainLayout */}
+
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<Home />} />          {/* loads inside Outlet */}
+        <Route index element={<Home />} />          
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="notes" element={<Notes />} />
+        <Route path="createnates" element={<CreateNotes />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
