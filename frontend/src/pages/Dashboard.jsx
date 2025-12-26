@@ -14,7 +14,7 @@ import {
   FaBookOpen,
   FaPenFancy
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import Notes from "../assets/images/home/notes.png"
 
@@ -29,17 +29,23 @@ const Dashboard = () => {
           {/* WELCOME */}
           <div className="col-lg-8 d-flex">
             <div className="dashboard-card welcome-card d-flex justify-content-between align-items-center w-100">
-              <div>
-                <h3>Hi, George!</h3>
-                <p>Stay focused. Plan smart. Get things done.</p>
+              <div className="dashboard-welcome">
+                <h3>Welcome back, Gokul</h3>
+                <p>Organize your day, focus on priorities, and move one step closer to your goals.</p>
 
                 <div className="quick-actions">
-                  <span><FaTasks /> Tasks</span>
-                  <span><FaStickyNote /> Notes</span>
-                  <span><FaCalendarDay /> Today</span>
+                  <span>
+                    <FaTasks /> Tasks
+                  </span>
+                  <span>
+                    <FaStickyNote /> Notes
+                  </span>
+                  <span>
+                    <FaCalendarDay /> Today
+                  </span>
                 </div>
 
-                <Link to="/createnates" className="btn btn-primary mt-3">
+                <Link to="/createnotes" className="create-btn mt-3">
                   <FaPlusCircle /> Create New Task
                 </Link>
               </div>
@@ -76,37 +82,56 @@ const Dashboard = () => {
         {/* STATS */}
         <div className="row g-4 mt-3">
 
-          <div className="col-md-6 col-lg-3 d-flex">
-            <div className="dashboard-card stat-card">
-              <FaList className=" star-icons text-success" />
-              <p>Total Tasks</p>
-              <h5>128</h5>
-            </div>
+          <div className="col-md-6 col-lg-3">
+            <NavLink to="/notes"
+              className="w-100 text-decoration-none">
+              <div className="dashboard-card stat-card">
+                <FaList className=" star-icons text-success" />
+                <p>Total Tasks</p>
+                <h5>128</h5>
+              </div>
+            </NavLink>
+
+          </div>
+
+          <div className="col-md-6 col-lg-3">
+            <NavLink to="/completednotes"
+              className="w-100 text-decoration-none">
+              <div className="dashboard-card stat-card">
+                <FaCheckCircle className=" star-icons text-primary" />
+                <p>Completed</p>
+                <h5>86</h5>
+              </div>
+            </NavLink>
+
+          </div>
+
+          <div className="col-md-6 col-lg-3">
+
+            <NavLink to="/pendingnotes"
+              className="w-100 text-decoration-none">
+              <div className="dashboard-card stat-card">
+                <FaHourglassHalf className=" star-icons text-warning" />
+                <p>Pending</p>
+                <h5>42</h5>
+              </div>
+            </NavLink>
+
           </div>
 
           <div className="col-md-6 col-lg-3 d-flex">
-            <div className="dashboard-card stat-card">
-              <FaCheckCircle className=" star-icons text-primary" />
-              <p>Completed</p>
-              <h5>86</h5>
-            </div>
+            <NavLink
+              to="/progressnotes"
+              className="w-100 text-decoration-none"
+            >
+              <div className="dashboard-card stat-card stat-card--danger">
+                <FaBookOpen className="stat-icon" />
+                <p className="stat-title">Progress</p>
+                <h5 className="stat-count">64</h5>
+              </div>
+            </NavLink>
           </div>
 
-          <div className="col-md-6 col-lg-3 d-flex">
-            <div className="dashboard-card stat-card">
-              <FaHourglassHalf className=" star-icons text-warning" />
-              <p>Pending</p>
-              <h5>42</h5>
-            </div>
-          </div>
-
-          <div className="col-md-6 col-lg-3 d-flex">
-            <div className="dashboard-card stat-card">
-              <FaBookOpen className=" star-icons text-danger" />
-              <p>Total Notes</p>
-              <h5>64</h5>
-            </div>
-          </div>
 
         </div>
 
