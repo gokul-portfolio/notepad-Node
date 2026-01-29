@@ -9,8 +9,10 @@ router.post("/login", loginUser);
 
 // protected route example
 router.get("/profile", protect, (req, res) => {
-  res.json({ message: "Access granted", userId: req.userId });
+  res.json({
+    message: "Access granted ✅",
+    user: req.user, 
+  });
 });
 
 module.exports = router;
-
