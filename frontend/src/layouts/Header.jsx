@@ -16,6 +16,13 @@ import {
 import LOGO from "../assets/images/logo.png";
 
 function NavigationBar() {
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        window.location.href = "/signin";
+    };
+
+
     return (
         <Navbar expand="md" className="custom-navbar">
             <Container>
@@ -67,7 +74,7 @@ function NavigationBar() {
                                 Profile
                             </NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/logout">
+                            <NavDropdown.Item onClick={handleLogout} >
                                 Logout
                             </NavDropdown.Item>
                         </NavDropdown>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import {
   BsType,
@@ -9,18 +9,44 @@ import {
 } from "react-icons/bs";
 import api from "../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreateNotes = () => {
+const EditNotes = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // note id from URL
+
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     tags: "",
-    attachment: null, // not sending now
   });
+
+  // 🔹 Fetch note details (prefill)
+  useEffect(() => {
+    fetchNote();
+  }, []);
+
+  const fetchNote = async () => {
+    try {
+      const res = await api.get(`/notes/${id}`);
+      const note = res.data;
+
+      setFormData({
+        title: note.title || "",
+        description: note.description || "",
+        category: note.category || "",
+        tags: note.tags ? note.tags.join(", ") : "",
+      });
+    } catch (error) {
+      toast.error("Failed to load note");
+      navigate("/notes");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -28,7 +54,7 @@ const CreateNotes = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submit
+  // 🔹 Update note
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -38,29 +64,31 @@ const CreateNotes = () => {
     }
 
     try {
-      await api.post("/notes", {
+      await api.put(`/notes/${id}`, {
         title: formData.title,
         description: formData.description,
         category: formData.category,
         tags: formData.tags,
       });
 
-      toast.success("Note created successfully");
-
-      // redirect to notes list
+      toast.success("Note updated successfully");
       navigate("/notes");
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to create note"
+        error.response?.data?.message || "Failed to update note"
       );
     }
   };
+
+  if (loading) {
+    return <p style={{ padding: "20px" }}>Loading note...</p>;
+  }
 
   return (
     <div className="notes-inner">
       <Container>
         <div className="notes-wrap mb-4">
-          <h2 className="main-head">Create Note</h2>
+          <h2 className="main-head">Edit Note</h2>
         </div>
 
         <div className="form-wrap rounded">
@@ -74,7 +102,6 @@ const CreateNotes = () => {
                   </Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter note title"
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
@@ -111,7 +138,6 @@ const CreateNotes = () => {
               <Form.Control
                 as="textarea"
                 rows={5}
-                placeholder="Write your note here..."
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
@@ -125,14 +151,13 @@ const CreateNotes = () => {
               </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Add tags (comma separated)"
                 name="tags"
                 value={formData.tags}
                 onChange={handleChange}
               />
             </Form.Group>
 
-            {/* Attachment (UI only for now) */}
+            {/* Attachment (future) */}
             <Form.Group className="mb-3">
               <Form.Label>
                 <BsPaperclip className="me-2" /> Attachment
@@ -145,7 +170,7 @@ const CreateNotes = () => {
 
             {/* Submit */}
             <Button type="submit" className="form-btn">
-              Save Note
+              Update Note
             </Button>
           </Form>
         </div>
@@ -154,4 +179,4 @@ const CreateNotes = () => {
   );
 };
 
-export default CreateNotes;
+export default EditNotes;

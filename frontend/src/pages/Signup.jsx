@@ -1,51 +1,115 @@
-import React from 'react'
-
+import React, { useState } from "react";
+import api from "../api/axios";
+import { toast } from "react-toastify";
 const Signup = () => {
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.id]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // 🔴 Frontend validation
+        if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+            toast.warning("All fields are required");
+            return;
+        }
+
+        if (form.password !== form.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        try {
+            const res = await api.post("/auth/register", {
+                name: form.name,
+                email: form.email,
+                password: form.password,
+            });
+
+            toast.success("Signup successful 🎉");
+
+            // Optional: auto login token irundha mattum
+            if (res.data.token) {
+                localStorage.setItem("token", res.data.token);
+                setTimeout(() => {
+                    window.location.href = "/dashboard";
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    window.location.href = "/signin";
+                }, 1500);
+            }
+
+        } catch (err) {
+            const code = err.response?.data?.code;
+
+            if (code === "USER_EXISTS") {
+                toast.error("User already exists");
+            }
+            else if (code === "MISSING_FIELDS") {
+                toast.warning("Please fill all fields");
+            }
+            else {
+                toast.error(err.response?.data?.message || "Signup failed");
+            }
+        }
+    };
+
+
     return (
-        <section >
+        <section>
             <div className="container">
-
                 <div className="form-wrap">
-
                     <div className="row">
-                        <div className="col-lg-6 login-img  d-flex justify-content-center align-items-center">
+                        <div className="col-lg-6 login-img d-flex justify-content-center align-items-center">
                             <div className="login-right">
                                 <h2>Create Your Account</h2>
                                 <p>
-                                    Join us today and unlock all features! Sign up to manage bookings, explore exclusive
-                                    travel packages, track your reservations, and stay updated with the latest offers.
-                                    Your information is safe, and registration is quick and secure.
+                                    Join us today and unlock all features! Sign up to manage
+                                    bookings, explore exclusive travel packages, track your
+                                    reservations, and stay updated with the latest offers.
                                 </p>
                             </div>
-
-
                         </div>
-                        <div className="col-lg-6 ">
-                            <div className="login-left ">
-                                <div className="login-header">
 
+                        <div className="col-lg-6">
+                            <div className="login-left">
+                                <div className="login-header">
                                     <h2>Join Us Today</h2>
                                     <h1>Create Your Account</h1>
                                     <p>
-                                        Sign up to explore exclusive travel packages, manage bookings, track your reservations,
-                                        and stay updated with the latest offers. Registration is quick, easy, and secure.
+                                        Sign up to explore exclusive travel packages, manage
+                                        bookings, track your reservations, and stay updated with the
+                                        latest offers.
                                     </p>
                                 </div>
 
-                                <form>
-                                    {/* Full Name Field */}
+                                {/* 🔥 CONNECTED FORM */}
+                                <form onSubmit={handleSubmit}>
+                                    {/* Full Name */}
                                     <div className="form-group mb-3 input-with-icon">
-                                        <label htmlFor="fullname">Full Name</label>
+                                        <label htmlFor="name">Full Name</label>
                                         <i className="fa fa-user icon"></i>
                                         <input
                                             type="text"
-                                            id="fullname"
+                                            id="name"
                                             className="form-control"
                                             placeholder="Enter your full name"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                           
                                         />
                                     </div>
 
-                                    {/* Email Field */}
+                                    {/* Email */}
                                     <div className="form-group mb-3 input-with-icon">
                                         <label htmlFor="email">Email</label>
                                         <i className="fa fa-envelope icon"></i>
@@ -54,10 +118,13 @@ const Signup = () => {
                                             id="email"
                                             className="form-control"
                                             placeholder="Enter your email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                          
                                         />
                                     </div>
 
-                                    {/* Password Field */}
+                                    {/* Password */}
                                     <div className="form-group mb-3 input-with-icon">
                                         <label htmlFor="password">Password</label>
                                         <i className="fa fa-lock icon"></i>
@@ -66,10 +133,13 @@ const Signup = () => {
                                             id="password"
                                             className="form-control"
                                             placeholder="Enter your password"
+                                            value={form.password}
+                                            onChange={handleChange}
+                                         
                                         />
                                     </div>
 
-                                    {/* Confirm Password Field */}
+                                    {/* Confirm Password */}
                                     <div className="form-group mb-3 input-with-icon">
                                         <label htmlFor="confirmPassword">Confirm Password</label>
                                         <i className="fa fa-lock icon"></i>
@@ -78,45 +148,48 @@ const Signup = () => {
                                             id="confirmPassword"
                                             className="form-control"
                                             placeholder="Confirm your password"
+                                            value={form.confirmPassword}
+                                            onChange={handleChange}
+                                           
                                         />
                                     </div>
 
-                                    {/* Sign Up Button */}
                                     <button type="submit" className="login-btn w-100">
                                         <span>Sign Up</span>
                                     </button>
                                 </form>
 
-                                {/* Login Link */}
                                 <p className="mt-3 text-center">
-                                    Already have an account? <a href="/login" className="signup-link">Login</a>
+                                    Already have an account?{" "}
+                                    <a href="/signin" className="signup-link">
+                                        Login
+                                    </a>
                                 </p>
 
-                                {/* Social Signup */}
                                 <div className="social-links">
                                     <div className="social-title-line">Or sign up with</div>
                                     <div className="social-icons">
-                                        <a href="#" className="social-item"><i className="fab fa-facebook-f"></i></a>
-                                        <a href="#" className="social-item"><i className="fab fa-instagram"></i></a>
-                                        <a href="#" className="social-item"><i className="fab fa-twitter"></i></a>
-                                        <a href="#" className="social-item"><i className="fab fa-google"></i></a>
+                                        <a href="#" className="social-item">
+                                            <i className="fab fa-facebook-f"></i>
+                                        </a>
+                                        <a href="#" className="social-item">
+                                            <i className="fab fa-instagram"></i>
+                                        </a>
+                                        <a href="#" className="social-item">
+                                            <i className="fab fa-twitter"></i>
+                                        </a>
+                                        <a href="#" className="social-item">
+                                            <i className="fab fa-google"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
                     </div>
-
-
                 </div>
-
-
             </div>
-
         </section>
-    )
-}
+    );
+};
 
-export default Signup
+export default Signup;

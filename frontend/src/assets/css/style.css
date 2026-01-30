@@ -1228,6 +1228,16 @@
         position: relative;
     }
 
+    .note-card__created {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: #666;
+    }
+.Toastify p{
+    color: var(--primary-color);
+}
 
     .notes-wrap {
         /* background: #ffffff; */
@@ -1594,6 +1604,7 @@
     .note-card__priority--low {
         background: #51cf66;
         color: #0b3d1a;
+        margin-right: 3px;
     }
 
     /* Edit button */
