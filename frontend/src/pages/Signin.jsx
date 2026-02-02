@@ -24,7 +24,7 @@ const Signin = () => {
 
       // 🔐 save token
       localStorage.setItem("token", res.data.token);
-
+      localStorage.setItem("user", JSON.stringify(data.user));
       // ✅ success toast
       toast.success("Login successful ");
 

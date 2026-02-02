@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import {
   BsType,
@@ -12,13 +12,16 @@ import {
   BsPerson,
   BsPaperclip,
 } from "react-icons/bs";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
-const CreateTask = () => {
+const EditTask = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -33,6 +36,38 @@ const CreateTask = () => {
     notify: false,
     attachment: null,
   });
+
+  // -----------------------------
+  // FETCH TASK
+  // -----------------------------
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        const { data } = await api.get(`/tasks/${id}`);
+
+        setFormData({
+          title: data.title || "",
+          description: data.description || "",
+          category: data.category || "Others",
+          priority: data.priority || "Medium",
+          status: data.status || "Pending",
+          startDate: data.startDate ? data.startDate.split("T")[0] : "",
+          deadline: data.deadline ? data.deadline.split("T")[0] : "",
+          assignedTo: data.assignedTo?._id || "",
+          tags: data.tags?.join(",") || "",
+          notify: Boolean(data.notify),
+          attachment: null,
+        });
+      } catch (err) {
+        toast.error("Failed to load task");
+        navigate("/alltasks");
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchTask();
+  }, [id, navigate]);
 
   // -----------------------------
   // HANDLE CHANGE
@@ -51,12 +86,11 @@ const CreateTask = () => {
   };
 
   // -----------------------------
-  // HANDLE SUBMIT
+  // UPDATE TASK
   // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔴 FRONTEND VALIDATION (schema based)
     if (!formData.title.trim()) {
       toast.error("Title is required");
       return;
@@ -67,24 +101,24 @@ const CreateTask = () => {
       return;
     }
 
-    // 🔁 FormData (multipart/form-data)
     const data = new FormData();
     data.append("title", formData.title.trim());
     data.append("description", formData.description.trim());
     data.append("category", formData.category);
     data.append("priority", formData.priority);
     data.append("status", formData.status);
-    data.append("startDate", formData.startDate);
     data.append("deadline", formData.deadline);
-    data.append("notify", formData.notify);
+    data.append("notify", String(formData.notify));
 
-    // tags → backend will split
-    if (formData.tags) {
+    if (formData.startDate) {
+      data.append("startDate", formData.startDate);
+    }
+
+    if (formData.tags.trim()) {
       data.append("tags", formData.tags);
     }
 
-    // admin only (backend decides)
-    if (formData.assignedTo) {
+    if (formData.assignedTo.trim()) {
       data.append("assignedTo", formData.assignedTo);
     }
 
@@ -94,20 +128,24 @@ const CreateTask = () => {
 
     try {
       setLoading(true);
-      await api.post("/tasks", data);
-      toast.success("Task created successfully");
+      await api.put(`/tasks/${id}`, data);
+      toast.success("Task updated successfully");
       navigate("/alltasks");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create task");
+      toast.error(error.response?.data?.message || "Update failed");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) {
+    return <p style={{ textAlign: "center" }}>Loading task...</p>;
+  }
+
   return (
     <div className="schedule-inner">
       <Container>
-        <h2 className="main-head mb-4">Schedule Task</h2>
+        <h2 className="main-head mb-4">Edit Task</h2>
 
         <div className="form-wrap rounded">
           <Form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -120,7 +158,6 @@ const CreateTask = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="Enter task title"
                 />
               </Col>
 
@@ -151,7 +188,7 @@ const CreateTask = () => {
               />
             </Form.Group>
 
-            {/* PRIORITY, STATUS, DATES */}
+            {/* PRIORITY / STATUS / DATES */}
             <Row className="mb-3">
               <Col md={3}>
                 <Form.Label><BsFlag /> Priority</Form.Label>
@@ -200,7 +237,7 @@ const CreateTask = () => {
               </Col>
             </Row>
 
-            {/* ASSIGNED TO & TAGS */}
+            {/* ASSIGNED + TAGS */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Label><BsPerson /> Assign To (Admin)</Form.Label>
@@ -208,7 +245,6 @@ const CreateTask = () => {
                   name="assignedTo"
                   value={formData.assignedTo}
                   onChange={handleChange}
-                  placeholder="User ID (admin only)"
                 />
               </Col>
 
@@ -218,14 +254,13 @@ const CreateTask = () => {
                   name="tags"
                   value={formData.tags}
                   onChange={handleChange}
-                  placeholder="react,node,api"
                 />
               </Col>
             </Row>
 
             {/* ATTACHMENT */}
             <Form.Group className="mb-3">
-              <Form.Label><BsPaperclip /> Attachment</Form.Label>
+              <Form.Label><BsPaperclip /> Replace Attachment</Form.Label>
               <Form.Control
                 type="file"
                 name="attachment"
@@ -244,7 +279,7 @@ const CreateTask = () => {
             />
 
             <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Task"}
+              {loading ? "Updating..." : "Update Task"}
             </Button>
 
           </Form>
@@ -254,4 +289,4 @@ const CreateTask = () => {
   );
 };
 
-export default CreateTask;
+export default EditTask;

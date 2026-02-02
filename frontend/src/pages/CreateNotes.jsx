@@ -19,7 +19,7 @@ const CreateNotes = () => {
     description: "",
     category: "",
     tags: "",
-    attachment: null, // not sending now
+    attachment: null,
   });
 
   // Handle input changes
