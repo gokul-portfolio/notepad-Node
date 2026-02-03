@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import {
   BsHouse,
@@ -16,12 +17,18 @@ import {
   BsBoxArrowRight
 } from "react-icons/bs";
 
+import { UserContext } from "../context/UserContext";
+
+
 
 import Logo from "../assets/images/logo.png";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const { logoutUser } = useContext(UserContext);
+
 
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
@@ -63,14 +70,14 @@ const Sidebar = () => {
       <div className="sidebar-section">
         {isOpen && <div className="sidebar-section-title"><h4>Tasks</h4></div>}
         <ul>
+
           <li>
-            <NavLink to="/todaytasks" className="sidebar-link">
-              <BsCheckCircle /> {isOpen && <span>Today</span>}
-              {isOpen && <span className="badge">16</span>}
+            <NavLink to="/createtasks" className="sidebar-link">
+              <BsStickies /> {isOpen && <span>Create Task</span>}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/alltasks" className="sidebar-link">
+            <NavLink to="/tasks" className="sidebar-link">
               <BsStickies /> {isOpen && <span>All Tasks</span>}
             </NavLink>
           </li>
@@ -133,15 +140,16 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
-          <li>
-            <NavLink to="/signin" className="sidebar-link">
-              <BsBoxArrowInRight /> {isOpen && <span>Signin</span>}
-            </NavLink>
-          </li>
+
 
           <li>
-            <NavLink to="/signup" className="sidebar-link">
-              <BsBoxArrowRight /> {isOpen && <span>Signup</span>}
+            <NavLink onClick={() => {
+              logoutUser();
+              window.location.href = "/signin";
+
+            }}
+              className="logout-icon sidebar-link">
+              <BsBoxArrowRight /> Logout
             </NavLink>
           </li>
 

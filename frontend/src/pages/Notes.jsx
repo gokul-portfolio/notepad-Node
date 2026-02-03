@@ -1,54 +1,45 @@
-import React, { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { UserContext } from "../context/UserContext";
+
 import NotesTopbar from "../components/notes/NotesTopbar";
 import NotesCard from "../components/notes/NotesCard";
-import api from "../api/axios";
-import { toast } from "react-toastify";
 
 const Notes = () => {
-  const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // 🔍 Search / Filter / Sort states
+  //  DATA FROM CONTEXT
+  const { notes, loadingNotes, getNotes } = useContext(UserContext);
+
+  //  UI STATES
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [sortBy, setSortBy] = useState("");
 
+  //  FETCH NOTES ON PAGE LOAD
   useEffect(() => {
-    fetchNotes();
+    getNotes();
   }, []);
 
-  const fetchNotes = async () => {
-    try {
-      const res = await api.get("/notes");
-      setNotes(res.data.data || res.data);
-    } catch (error) {
-      toast.error("Failed to load notes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔥 Search + Filter + Sort Logic
-  const filteredNotes = notes
-    // Search
-    .filter(note =>
-      note.title?.toLowerCase().includes(search.toLowerCase())
-    )
-    // Category filter ✅
-    .filter(note =>
-      category === "All" ? true : note.category === category
-    )
-    // Sort
-    .sort((a, b) => {
-      if (sortBy === "Date") {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      }
-      return 0;
-    });
+  //  OPTIMIZED SEARCH + FILTER + SORT
+  const filteredNotes = useMemo(() => {
+    return [...notes]
+      .filter(note =>
+        note.title?.toLowerCase().includes(search.toLowerCase())
+      )
+      .filter(note =>
+        category === "All" ? true : note.category === category
+      )
+      .sort((a, b) => {
+        if (sortBy === "Date") {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return 0;
+      });
+  }, [notes, search, category, sortBy]);
 
   return (
     <div className="container-fluid">
       <div className="notes-wrap">
+
         <NotesTopbar
           search={search}
           setSearch={setSearch}
@@ -59,25 +50,30 @@ const Notes = () => {
         />
 
         <div className="row g-3">
-  {loading && <p>Loading notes...</p>}
 
-  {!loading && filteredNotes.length === 0 && (
-    <p>No notes found</p>
-  )}
+          {loadingNotes && <p>Loading notes...</p>}
 
-  {!loading && filteredNotes.length > 0 &&
-    filteredNotes.map((note) => (
-      <div
-        key={note._id}
-        className="col-xl-3 col-lg-4 col-md-6 col-sm-12"
-      >
-        <NotesCard note={note} />
-      </div>
-    ))
-  }
-</div>
+          {!loadingNotes && filteredNotes.length === 0 && (
+            <p>No notes found</p>
+          )}
+
+          {!loadingNotes &&
+            filteredNotes.map(note => (
+              <div
+                key={note._id}
+                className="col-xl-4 col-lg-6 col-md-12 col-sm-12"
+              >
+                
+                <NotesCard note={note} />
 
 
+              </div>
+              
+            ))
+
+          }
+
+        </div>
       </div>
     </div>
   );

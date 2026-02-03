@@ -48,7 +48,7 @@ const NotesTopbar = ({
                 </select>
 
                 {/* Create */}
-                <NavLink to="/createnotes" className="create-btn">
+                <NavLink to="/create" className="create-btn">
                     + Create Note
                 </NavLink>
             </div>

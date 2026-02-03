@@ -1,25 +1,27 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import {
-  BsType,
-  BsJournalText,
-  BsFolder,
-  BsFlag,
-  BsTags,
-  BsBell,
-  BsCalendar,
-  BsEye,
-  BsPerson,
-  BsPaperclip,
-} from "react-icons/bs";
-import api from "../api/axios";
+import React, { useState, useContext, useEffect } from "react";
+import { Container } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+import api from "../api/axios";
+import { UserContext } from "../context/UserContext";
+import ScheduleForm from "../components/schedule/ScheduleForm";
+
 const CreateTask = () => {
   const navigate = useNavigate();
+  const { createTask, user } = useContext(UserContext);
+
+  // 🔐 Safety
+  if (!user) return null;
+  if (user.role !== "admin") return null;
+
   const [loading, setLoading] = useState(false);
 
+  // 🔹 API driven data
+  const [designations, setDesignations] = useState([]);
+  const [members, setMembers] = useState([]);
+
+  // ✅ FULL formData (TaskForm expects this)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -28,35 +30,69 @@ const CreateTask = () => {
     status: "Pending",
     startDate: "",
     deadline: "",
+    designation: "",
     assignedTo: "",
     tags: "",
     notify: false,
     attachment: null,
   });
 
-  // -----------------------------
-  // HANDLE CHANGE
-  // -----------------------------
+  // 🔹 Load designations from API
+  useEffect(() => {
+    const fetchDesignations = async () => {
+      try {
+        const res = await api.get("/users/designations");
+        setDesignations(res.data);
+      } catch (err) {
+        toast.error("Failed to load designations");
+      }
+    };
+
+    fetchDesignations();
+  }, []);
+
+  // 🔹 Load users when designation changes
+  useEffect(() => {
+    if (!formData.designation) {
+      setMembers([]);
+      return;
+    }
+
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get(
+          `/users?designation=${formData.designation}`
+        );
+        setMembers(res.data);
+      } catch (err) {
+        toast.error("Failed to load users");
+      }
+    };
+
+    fetchUsers();
+  }, [formData.designation]);
+
+  // 🔹 Change handler
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
 
-    if (type === "file") {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: type === "checkbox" ? checked : value,
-      });
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "file"
+          ? files[0]
+          : type === "checkbox"
+          ? checked
+          : value,
+      // 🔥 designation change → reset assigned user
+      ...(name === "designation" && { assignedTo: "" }),
+    }));
   };
 
-  // -----------------------------
-  // HANDLE SUBMIT
-  // -----------------------------
+  // 🔹 Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔴 FRONTEND VALIDATION (schema based)
     if (!formData.title.trim()) {
       toast.error("Title is required");
       return;
@@ -67,40 +103,20 @@ const CreateTask = () => {
       return;
     }
 
-    // 🔁 FormData (multipart/form-data)
     const data = new FormData();
-    data.append("title", formData.title.trim());
-    data.append("description", formData.description.trim());
-    data.append("category", formData.category);
-    data.append("priority", formData.priority);
-    data.append("status", formData.status);
-    data.append("startDate", formData.startDate);
-    data.append("deadline", formData.deadline);
-    data.append("notify", formData.notify);
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null && value !== "") {
+        data.append(key, value);
+      }
+    });
 
-    // tags → backend will split
-    if (formData.tags) {
-      data.append("tags", formData.tags);
-    }
+    setLoading(true);
+    const success = await createTask(data);
+    setLoading(false);
 
-    // admin only (backend decides)
-    if (formData.assignedTo) {
-      data.append("assignedTo", formData.assignedTo);
-    }
-
-    if (formData.attachment) {
-      data.append("attachment", formData.attachment);
-    }
-
-    try {
-      setLoading(true);
-      await api.post("/tasks", data);
+    if (success) {
       toast.success("Task created successfully");
-      navigate("/alltasks");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create task");
-    } finally {
-      setLoading(false);
+      navigate("/tasks");
     }
   };
 
@@ -110,144 +126,17 @@ const CreateTask = () => {
         <h2 className="main-head mb-4">Schedule Task</h2>
 
         <div className="form-wrap rounded">
-          <Form onSubmit={handleSubmit} encType="multipart/form-data">
-
-            {/* TITLE & CATEGORY */}
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Label><BsType /> Task Title *</Form.Label>
-                <Form.Control
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Enter task title"
-                />
-              </Col>
-
-              <Col md={6}>
-                <Form.Label><BsFolder /> Category</Form.Label>
-                <Form.Select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                >
-                  <option value="Work">Work</option>
-                  <option value="Personal">Personal</option>
-                  <option value="Urgent">Urgent</option>
-                  <option value="Others">Others</option>
-                </Form.Select>
-              </Col>
-            </Row>
-
-            {/* DESCRIPTION */}
-            <Form.Group className="mb-3">
-              <Form.Label><BsJournalText /> Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            {/* PRIORITY, STATUS, DATES */}
-            <Row className="mb-3">
-              <Col md={3}>
-                <Form.Label><BsFlag /> Priority</Form.Label>
-                <Form.Select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleChange}
-                >
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </Form.Select>
-              </Col>
-
-              <Col md={3}>
-                <Form.Label><BsEye /> Status</Form.Label>
-                <Form.Select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </Form.Select>
-              </Col>
-
-              <Col md={3}>
-                <Form.Label><BsCalendar /> Start Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                />
-              </Col>
-
-              <Col md={3}>
-                <Form.Label><BsBell /> Deadline *</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="deadline"
-                  value={formData.deadline}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            {/* ASSIGNED TO & TAGS */}
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Label><BsPerson /> Assign To (Admin)</Form.Label>
-                <Form.Control
-                  name="assignedTo"
-                  value={formData.assignedTo}
-                  onChange={handleChange}
-                  placeholder="User ID (admin only)"
-                />
-              </Col>
-
-              <Col md={6}>
-                <Form.Label><BsTags /> Tags</Form.Label>
-                <Form.Control
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleChange}
-                  placeholder="react,node,api"
-                />
-              </Col>
-            </Row>
-
-            {/* ATTACHMENT */}
-            <Form.Group className="mb-3">
-              <Form.Label><BsPaperclip /> Attachment</Form.Label>
-              <Form.Control
-                type="file"
-                name="attachment"
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            {/* NOTIFY */}
-            <Form.Check
-              className="mb-3"
-              type="checkbox"
-              label="Notify Employee"
-              name="notify"
-              checked={formData.notify}
-              onChange={handleChange}
-            />
-
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Task"}
-            </Button>
-
-          </Form>
+          {/* ❌ ScheduleForm → ✅ TaskForm */}
+          <ScheduleForm
+            formData={formData}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            loading={loading}
+            submitText="Schedule Task"
+            isAdmin={true}
+            designations={designations}
+            members={members}
+          />
         </div>
       </Container>
     </div>

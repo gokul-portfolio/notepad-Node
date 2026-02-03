@@ -1,18 +1,20 @@
-import React from "react";
 import { FiCalendar, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/axios";
+import { useContext } from "react";
 import { toast } from "react-toastify";
+import { UserContext } from "../../context/UserContext";
+import ConfirmPopup from "../common/ConfirmPopup";
 
-const NotesCard = ({ note, onDelete }) => {
+const NotesCard = ({ note }) => {
     const navigate = useNavigate();
+    const { deleteNote } = useContext(UserContext);
 
     const {
         title,
         category,
         description,
         createdAt,
-        tags
+        tags,
     } = note;
 
     const handleEdit = () => {
@@ -22,48 +24,15 @@ const NotesCard = ({ note, onDelete }) => {
     const handleDelete = () => {
         toast(
             ({ closeToast }) => (
-                <div style={{ textAlign: "center" }}>
-                    <p>Are you sure you want to delete this note?</p>
-
-                    <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                        <button
-                            onClick={async () => {
-                                try {
-                                    await api.delete(`/notes/${note._id}`);
-                                    toast.success("Note deleted");
-                                    onDelete?.(note._id);
-                                    closeToast();
-                                } catch (err) {
-                                    toast.error("Delete failed");
-                                }
-                            }}
-                            style={{
-                                background: "#dc3545",
-                                color: "#fff",
-                                border: "none",
-                                padding: "6px 12px",
-                                borderRadius: "4px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Yes
-                        </button>
-
-                        <button
-                            onClick={closeToast}
-                            style={{
-                                background: "#6c757d",
-                                color: "#fff",
-                                border: "none",
-                                padding: "6px 12px",
-                                borderRadius: "4px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <ConfirmPopup
+                    message="Are you sure you want to delete this note? This action cannot be undone."
+                    confirmText="Delete"
+                    onConfirm={() => {
+                        deleteNote(note._id);
+                        closeToast();
+                    }}
+                    onCancel={closeToast}
+                />
             ),
             {
                 position: "top-center",
@@ -75,7 +44,7 @@ const NotesCard = ({ note, onDelete }) => {
     };
 
     return (
-        <div className={`note-card note-card--low`}>
+        <div className="note-card note-card--low">
             <div className="note-card__header">
                 <h3 className="note-card__title">{title}</h3>
                 <span className="note-card__category">{category}</span>
@@ -84,24 +53,17 @@ const NotesCard = ({ note, onDelete }) => {
             <p className="note-card__text">{description}</p>
 
             <div className="note-card__footer">
-                <span className="note-card__deadline">
-                    <FiCalendar size={14} /> —
-                </span>
-
                 <span className="note-card__created">
                     <FiCalendar size={14} />
                     {new Date(createdAt).toLocaleDateString()}
                 </span>
 
                 <div className="note-card__tags">
-                    {tags?.map((tag, index) => (
-                        <span
-                            key={index}
-                            className="note-card__priority note-card__priority--low"
-                        >
-                            #{tag}
+                    {tags?.[0] && (
+                        <span className="note-card__priority note-card__priority--low">
+                            #{tags[0]}
                         </span>
-                    ))}
+                    )}
                 </div>
 
                 <button

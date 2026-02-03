@@ -13,8 +13,8 @@ const taskSchema = new mongoose.Schema(
         category: {
             type: String,
             trim: true,
-            enum: ["Work", "Personal", "Urgent", "Others"],
-            default: "Others",
+            enum: ["Others", "Development", "Design", "Marketing"],
+            default: "Developer",
         },
 
         description: {
@@ -60,7 +60,7 @@ const taskSchema = new mongoose.Schema(
             default: [],
         },
         attachment: {
-            type: String, 
+            type: String,
         },
 
         notify: {

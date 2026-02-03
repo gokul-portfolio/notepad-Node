@@ -1,5 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
+import ConfirmPopup from "../common/ConfirmPopup";
 import {
     BsFolder,
     BsFlag,
@@ -13,6 +15,28 @@ import {
 const TaskCard = ({ task, onDelete, onEdit }) => {
     const status = task.status || "Pending";
     const priority = task.priority || "Medium";
+
+    const handleDelete = () => {
+        toast(
+            ({ closeToast }) => (
+                <ConfirmPopup
+                    message="Are you sure you want to delete this task?"
+                    confirmText="Delete"
+                    onConfirm={() => {
+                        onDelete?.(task._id);
+                        closeToast();
+                    }}
+                    onCancel={closeToast}
+                />
+            ),
+            {
+                autoClose: false,
+                closeOnClick: false,
+                closeButton: false,
+                position: "top-center",
+            }
+        );
+    };
 
     return (
         <div
@@ -29,7 +53,7 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
                 />
             </div>
 
-            {/* Task Body */}
+            {/* Body */}
             <div className="task-body">
                 <div className="task-header">
                     <h4 className="task-title">{task.title}</h4>
@@ -42,16 +66,13 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
                     <p className="task-desc">{task.description}</p>
                 )}
 
-                {/* Meta */}
                 <div className="task-meta mt-3">
                     <span>
                         <BsFolder /> {task.category || "Others"}
                     </span>
-
                     <span>
                         <BsFlag /> {priority}
                     </span>
-
                     <span>
                         <BsCalendarEvent />{" "}
                         {task.deadline
@@ -60,7 +81,6 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
                     </span>
                 </div>
 
-                {/* Tags */}
                 {task.tags?.length > 0 && (
                     <div className="task-tags mt-3">
                         {task.tags.map((tag, index) => (
@@ -104,7 +124,7 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
                     variant="light"
                     size="sm"
                     title="Delete"
-                    onClick={() => onDelete?.(task._id)}
+                    onClick={handleDelete}
                 >
                     <BsTrash />
                 </Button>

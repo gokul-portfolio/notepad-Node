@@ -3,6 +3,8 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const userRoutes = require("./routes/userRoutes");
+
 
 const app = express();
 
@@ -14,12 +16,13 @@ app.use(
   })
 );
 
-// ✅ Body parser MUST come BEFORE routes
 app.use(express.json());
 
 // ✅ Routes
 app.use("/api/tasks", taskRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+
 
 module.exports = app;

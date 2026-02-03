@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthCheck from "./components/AuthCheck";
+import AdminRoute from "./routes/AdminRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,58 +16,41 @@ const CreateNotes = lazy(() => import("./pages/CreateNotes"));
 const EditNotes = lazy(() => import("./pages/EditNotes"));
 const EditTask = lazy(() => import("./pages/EditTask"));
 
-const Schedule = lazy(() => import("./pages/Schedule"));
-const AllTask = lazy(() => import("./pages/AllTask"));
-const TodayTask = lazy(() => import("./pages/TodoNotes"));
+const CreateTasks = lazy(() => import("./pages/CreateTask"));
+const Tasks = lazy(() => import("./pages/Task"));
 const HighPriority = lazy(() => import("./pages/HighPriorityTask"));
-
 const Team = lazy(() => import("./pages/Team"));
 const PageNotFound = lazy(() => import("./pages/PageNotFound"));
 const MainLayout = lazy(() => import("./layouts/MainLayout"));
-
-
-
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const Schedule = lazy(() => import("./pages/Schedule"));
 
 const App = () => {
   const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <>
-      {/* Toast – render once */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-      <Suspense
-        fallback={
-          <div style={{ textAlign: "center", marginTop: "50px" }}>
-            Loading...
-          </div>
-        }
-      >
+      <Suspense fallback={<div className="text-center mt-5">Loading...</div>}>
         <Routes>
 
-          {/* Root redirect */}
+          {/* Root */}
           <Route
             path="/"
             element={
-              isLoggedIn ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Navigate to="/signin" replace />
-              )
+              isLoggedIn
+                ? <Navigate to="/dashboard" replace />
+                : <Navigate to="/signin" replace />
             }
           />
 
-          {/* Public routes */}
+          {/* Public */}
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* 🔐 Protected routes */}
+          {/* 🔐 AUTHENTICATED */}
           <Route
             element={
               <ProtectedRoute>
@@ -76,24 +60,22 @@ const App = () => {
               </ProtectedRoute>
             }
           >
-            {/* Dashboard */}
+            {/* Common */}
             <Route path="dashboard" element={<Dashboard />} />
-
-            {/* Notes */}
             <Route path="notes" element={<Notes />} />
-            <Route path="notes/create" element={<CreateNotes />} />
+            <Route path="createnotes" element={<CreateNotes />} />
             <Route path="notes/edit/:id" element={<EditNotes />} />
-
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="createtasks" element={<CreateTasks />} />
             <Route path="tasks/edit/:id" element={<EditTask />} />
-
-            {/* Tasks */}
-            <Route path="schedule" element={<Schedule />} />
-            <Route path="todaytasks" element={<TodayTask />} />
-            <Route path="alltasks" element={<AllTask />} />
             <Route path="highpriority" element={<HighPriority />} />
-
-            {/* Team */}
             <Route path="team" element={<Team />} />
+
+            {/* 👮 ADMIN ONLY */}
+            <Route element={<AdminRoute />}>
+              <Route path="schedule" element={<Schedule />} />
+            </Route>
+
           </Route>
 
           {/* 404 */}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Offcanvas from "react-bootstrap/Offcanvas";
@@ -9,44 +9,33 @@ import { Link } from "react-router-dom";
 
 import {
   FaBars,
-  FaPlus,
   FaSearch,
   FaUserCircle,
 } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
 
+import { UserContext } from "../context/UserContext";
 import LOGO from "../assets/images/logo.png";
 
 function NavigationBar() {
-  const [user, setUser] = useState(null);
 
-  // 🔹 Get user from localStorage (after login)
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/signin";
-  };
+  const { user, logoutUser } = useContext(UserContext);
 
   return (
     <Navbar expand="md" className="custom-navbar">
       <Container>
-        {/* LOGO */}
+
+        {/* LEFT : LOGO */}
         <Navbar.Brand as={Link} to="/notes">
           <img src={LOGO} alt="logo" height="40" />
         </Navbar.Brand>
 
-        {/* MOBILE TOGGLER */}
+        {/* MOBILE TOGGLE */}
         <Navbar.Toggle aria-controls="offcanvasNavbar">
           <FaBars />
         </Navbar.Toggle>
 
-        {/* OFFCANVAS */}
+        {/* RIGHT SIDE */}
         <Navbar.Offcanvas id="offcanvasNavbar" placement="end">
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>
@@ -54,20 +43,10 @@ function NavigationBar() {
             </Offcanvas.Title>
           </Offcanvas.Header>
 
-          <Offcanvas.Body className="align-items-center">
-            {/* CREATE NOTE */}
-            <Nav className="me-auto">
-              <Nav.Link
-                as={Link}
-                to="/notes/new"
-                className="btn btn-primary text-white"
-              >
-                <FaPlus /> Create Note
-              </Nav.Link>
-            </Nav>
+          <Offcanvas.Body className="d-flex align-items-center justify-content-end gap-3">
 
             {/* SEARCH */}
-            <Form className="d-flex me-md-3 my-3 my-md-0">
+            <Form className="d-flex">
               <Form.Control
                 type="search"
                 placeholder="Search notes..."
@@ -78,29 +57,40 @@ function NavigationBar() {
             </Form>
 
             {/* PROFILE */}
-            <NavDropdown
-              align="end"
-              title={
-                <span className="d-flex align-items-center gap-2">
-                  <FaUserCircle size={26} />
-                  <span className="fw-medium">
-                    {user?.name || "Account"}
+            <Nav>
+              <NavDropdown
+                align="end"
+                title={
+                  <span className="d-flex align-items-center gap-2">
+                    <FaUserCircle size={26} />
+                    <span className="fw-medium">
+                      {user?.name || "Account"}
+                    </span>
                   </span>
-                </span>
-              }
-            >
-              <NavDropdown.Item as={Link} to="/profile">
-                Profile
-              </NavDropdown.Item>
+                }
+              >
+                <NavDropdown.Item as={Link} to="/profile">
+                  <FaUserCircle className="me-2" />
+                  Profile
+                </NavDropdown.Item>
 
-              <NavDropdown.Divider />
+                <NavDropdown.Divider />
 
-              <NavDropdown.Item onClick={handleLogout}>
-                Logout
-              </NavDropdown.Item>
-            </NavDropdown>
+                <NavDropdown.Item
+                  onClick={() => {
+                    logoutUser();
+                    window.location.href = "/signin";
+                  }}
+                >
+                  <FiLogOut className="me-2" />
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+
           </Offcanvas.Body>
         </Navbar.Offcanvas>
+
       </Container>
     </Navbar>
   );
