@@ -49,7 +49,7 @@ const Notes = () => {
           setSortBy={setSortBy}
         />
 
-        <div className="row g-3">
+        <div className="row justify-content-center align-items-center g-3">
 
           {loadingNotes && <p>Loading notes...</p>}
 
@@ -61,7 +61,7 @@ const Notes = () => {
             filteredNotes.map(note => (
               <div
                 key={note._id}
-                className="col-xl-4 col-lg-6 col-md-12 col-sm-12"
+                className="col-xl-4 col-lg-6 col-md-6 col-sm-12 d-flex note-col"
               >
                 
                 <NotesCard note={note} />

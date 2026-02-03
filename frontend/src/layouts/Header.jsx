@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Offcanvas from "react-bootstrap/Offcanvas";
@@ -7,50 +7,41 @@ import Form from "react-bootstrap/Form";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link } from "react-router-dom";
 
-import {
-  FaBars,
-  FaSearch,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaBars, FaSearch, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 
 import { UserContext } from "../context/UserContext";
 import LOGO from "../assets/images/logo.png";
 
 function NavigationBar() {
-
   const { user, logoutUser } = useContext(UserContext);
+  const [show, setShow] = useState(false);
 
   return (
-    <Navbar expand="md" className="custom-navbar">
-      <Container>
+    <>
+      {/* ================= NAVBAR ================= */}
+      <Navbar expand="md" className="custom-navbar">
+        <Container>
 
-        {/* LEFT : LOGO */}
-        <Navbar.Brand as={Link} to="/notes">
-          <img src={LOGO} alt="logo" height="40" />
-        </Navbar.Brand>
+          {/* LEFT : LOGO */}
+          <Navbar.Brand as={Link} to="/dashboard">
+            <img src={LOGO} alt="logo" height="40" />
+          </Navbar.Brand>
 
-        {/* MOBILE TOGGLE */}
-        <Navbar.Toggle aria-controls="offcanvasNavbar">
-          <FaBars />
-        </Navbar.Toggle>
+          {/* MOBILE TOGGLE */}
+          <button
+            className="navbar-toggler d-md-none"
+            onClick={() => setShow(true)}
+          >
+            <FaBars />
+          </button>
 
-        {/* RIGHT SIDE */}
-        <Navbar.Offcanvas id="offcanvasNavbar" placement="end">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>
-              <img src={LOGO} alt="logo" height="35" />
-            </Offcanvas.Title>
-          </Offcanvas.Header>
-
-          <Offcanvas.Body className="d-flex align-items-center justify-content-end gap-3">
+          {/* DESKTOP RIGHT */}
+          <div className="right-controls d-none d-md-flex gap-3 align-items-center">
 
             {/* SEARCH */}
             <Form className="d-flex">
-              <Form.Control
-                type="search"
-                placeholder="Search notes..."
-              />
+              <Form.Control type="search" placeholder="Search..." />
               <button className="search-btn ms-2" type="button">
                 <FaSearch />
               </button>
@@ -63,36 +54,74 @@ function NavigationBar() {
                 title={
                   <span className="d-flex align-items-center gap-2">
                     <FaUserCircle size={26} />
-                    <span className="fw-medium">
-                      {user?.name || "Account"}
-                    </span>
+                    <span>{user?.name}</span>
                   </span>
                 }
               >
                 <NavDropdown.Item as={Link} to="/profile">
-                  <FaUserCircle className="me-2" />
                   Profile
                 </NavDropdown.Item>
-
                 <NavDropdown.Divider />
-
                 <NavDropdown.Item
                   onClick={() => {
                     logoutUser();
                     window.location.href = "/signin";
                   }}
                 >
-                  <FiLogOut className="me-2" />
-                  Logout
+                  <FiLogOut className="me-2" /> Logout
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>
 
-          </Offcanvas.Body>
-        </Navbar.Offcanvas>
+          </div>
+        </Container>
+      </Navbar>
 
-      </Container>
-    </Navbar>
+      {/* ================= OFFCANVAS (MOBILE) ================= */}
+      <Offcanvas
+        show={show}
+        onHide={() => setShow(false)}
+        placement="end"
+        className="custom-offcanvas"
+      >
+        <Offcanvas.Header closeButton>
+          <img src={LOGO} alt="logo" height="35" />
+        </Offcanvas.Header>
+
+        <Offcanvas.Body>
+
+          {/* SEARCH */}
+          <Form className="d-flex mb-4">
+            <Form.Control type="search" placeholder="Search..." />
+            <button className="search-btn ms-2" type="button">
+              <FaSearch />
+            </button>
+          </Form>
+
+          {/* PROFILE */}
+         <h6 className="offcanvas-menu-title">Menu</h6>
+
+          <Nav className="flex-column gap-2">
+            <Nav.Link as={Link} to="/profile">
+              <FaUserCircle className="me-2 border-bottom" />
+              Profile
+            </Nav.Link>
+
+            <Nav.Link
+              onClick={() => {
+                logoutUser();
+                window.location.href = "/signin";
+              }}
+              className="text-danger border-bottom"
+            >
+              <FiLogOut className="me-2" />
+              Logout
+            </Nav.Link>
+          </Nav>
+
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
   );
 }
 

@@ -106,51 +106,25 @@ const Sidebar = () => {
         </ul>
       </div>
 
-      {/* TEAM / RECORDS */}
-      <div className="sidebar-section">
-        {isOpen && <div className="sidebar-section-title"><h4>Team / Records</h4></div>}
-        <ul>
-          <li>
-            <NavLink to="/team" className="sidebar-link">
-              <BsPeople /> {isOpen && <span>Team</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/clients" className="sidebar-link">
-              <BsPersonBadge /> {isOpen && <span>Clients</span>}
-            </NavLink>
-          </li>
-        </ul>
-      </div>
-
       {/* SETTINGS / SUPPORT */}
       <div className="sidebar-section">
         {isOpen && <div className="sidebar-section-title"><h4>Settings</h4></div>}
         <ul>
 
-          <li>
-            <NavLink to="/settings" className="sidebar-link">
-              <BsGear /> {isOpen && <span>Settings</span>}
-            </NavLink>
-          </li>
 
           <li>
-            <NavLink to="/support" className="sidebar-link">
-              <BsLifePreserver /> {isOpen && <span>Support</span>}
-            </NavLink>
-          </li>
 
-
-
-          <li>
             <NavLink onClick={() => {
               logoutUser();
               window.location.href = "/signin";
 
             }}
               className="logout-icon sidebar-link">
-              <BsBoxArrowRight /> Logout
+
+              <BsBoxArrowRight /> {isOpen && <span>Logout</span>}
+
             </NavLink>
+
           </li>
 
         </ul>

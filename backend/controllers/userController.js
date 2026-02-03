@@ -48,7 +48,7 @@ const getUsersByDesignation = async (req, res) => {
  */
 const getTeamMembers = async (req, res) => {
   try {
-    const { role, designation } = req.user; // from protect middleware
+    const { role, designation } = req.user; 
 
     const filter = { isActive: true };
 

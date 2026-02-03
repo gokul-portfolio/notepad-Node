@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import {
   FaTasks,
   FaStickyNote,
@@ -12,13 +11,40 @@ import {
   FaCheckCircle,
   FaHourglassHalf,
   FaBookOpen,
-  FaPenFancy
 } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
 
-import Notes from "../assets/images/home/notes.png"
+import NotesImg from "../assets/images/home/notes.png";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const Dashboard = () => {
+  const {
+    user,
+    tasks,
+    notes,
+    getTasks,
+    getNotes,
+  } = useContext(UserContext);
+
+  // 🔥 Load dashboard data
+  useEffect(() => {
+    if (user) {
+      getTasks();
+      getNotes();
+    }
+  }, [user, getTasks, getNotes]);
+
+  /* =====================
+     CALCULATIONS
+  ===================== */
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === "completed").length;
+  const pendingTasks = tasks.filter(t => t.status === "pending").length;
+  const todayTasks = tasks.filter(t => t.isToday).slice(0, 3);
+
+  const recentNotes = notes.slice(0, 2);
+
   return (
     <section className="dashboard-section">
       <div className="container-fluid">
@@ -30,28 +56,27 @@ const Dashboard = () => {
           <div className="col-lg-8 d-flex">
             <div className="dashboard-card welcome-card d-flex justify-content-between align-items-center w-100">
               <div className="dashboard-welcome">
-                <h3>Welcome back, Gokul</h3>
-                <p>Organize your day, focus on priorities, and move one step closer to your goals.</p>
+                <h3 className="main-header">Welcome back, {user?.name || "User"}</h3>
+                <p>
+                  Organize your day, focus on priorities, and move one step closer to your goals.
+                </p>
 
                 <div className="quick-actions">
-                  <span>
-                    <FaTasks /> Tasks
-                  </span>
-                  <span>
-                    <FaStickyNote /> Notes
-                  </span>
-                  <span>
-                    <FaCalendarDay /> Today
-                  </span>
+                  <span><FaTasks /> Tasks</span>
+                  <span><FaStickyNote /> Notes</span>
+                  <span><FaCalendarDay /> Today</span>
                 </div>
 
-                <Link to="/createnotes" className="create-btn mt-3">
+                <Link to="/createnotes" className="create-btn mt-3 me-2">
+                  <FaPlusCircle /> Create New Notes
+                </Link>
+                <Link to="/createtasks" className="create-btn mt-3">
                   <FaPlusCircle /> Create New Task
                 </Link>
               </div>
 
               <div className="icon-avatar">
-                <img src={Notes} className="img-fluid" alt="" />
+                <img src={NotesImg} className="img-fluid" alt="notes" />
               </div>
             </div>
           </div>
@@ -63,12 +88,12 @@ const Dashboard = () => {
 
               <div className="notify-item yellow">
                 <FaBell />
-                <p>3 tasks scheduled for today</p>
+                <p>{todayTasks.length} tasks scheduled for today</p>
               </div>
 
               <div className="notify-item red">
                 <FaExclamationCircle />
-                <p>2 overdue tasks</p>
+                <p>{pendingTasks} pending tasks</p>
               </div>
 
               <div className="notify-item blue">
@@ -82,56 +107,45 @@ const Dashboard = () => {
         {/* STATS */}
         <div className="row g-4 mt-3">
 
-          <div className="col-md-6 col-lg-3">
-            <NavLink to="/notes"
-              className="w-100 text-decoration-none">
+          <div className="col-md-6 col-lg-3 d-flex">
+            <NavLink to="/tasks" className="w-100 text-decoration-none">
               <div className="dashboard-card stat-card">
-                <FaList className=" star-icons text-success" />
+                <FaList className="star-icons text-success" />
                 <p>Total Tasks</p>
-                <h5>128</h5>
+                <h5>{totalTasks}</h5>
               </div>
             </NavLink>
-
           </div>
 
-          <div className="col-md-6 col-lg-3">
-            <NavLink to="/completednotes"
-              className="w-100 text-decoration-none">
+          <div className="col-md-6 col-lg-3 d-flex" >
+            <NavLink to="/completedtasks" className="w-100 text-decoration-none">
               <div className="dashboard-card stat-card">
-                <FaCheckCircle className=" star-icons text-primary" />
+                <FaCheckCircle className="star-icons text-primary" />
                 <p>Completed</p>
-                <h5>86</h5>
+                <h5>{completedTasks}</h5>
               </div>
             </NavLink>
-
-          </div>
-
-          <div className="col-md-6 col-lg-3">
-
-            <NavLink to="/pendingnotes"
-              className="w-100 text-decoration-none">
-              <div className="dashboard-card stat-card">
-                <FaHourglassHalf className=" star-icons text-warning" />
-                <p>Pending</p>
-                <h5>42</h5>
-              </div>
-            </NavLink>
-
           </div>
 
           <div className="col-md-6 col-lg-3 d-flex">
-            <NavLink
-              to="/progressnotes"
-              className="w-100 text-decoration-none"
-            >
-              <div className="dashboard-card stat-card stat-card--danger">
-                <FaBookOpen className="stat-icon" />
-                <p className="stat-title">Progress</p>
-                <h5 className="stat-count">64</h5>
+            <NavLink to="/pendingtasks" className="w-100 text-decoration-none">
+              <div className="dashboard-card stat-card">
+                <FaHourglassHalf className="star-icons text-warning" />
+                <p>Pending</p>
+                <h5>{pendingTasks}</h5>
               </div>
             </NavLink>
           </div>
 
+          <div className="col-md-6 col-lg-3 d-flex">
+            <NavLink to="/notes" className="w-100 text-decoration-none">
+              <div className="dashboard-card stat-card stat-card--danger">
+                <FaBookOpen className="stat-icon" />
+                <p className="stat-title">Notes</p>
+                <h5 className="stat-count">{notes.length}</h5>
+              </div>
+            </NavLink>
+          </div>
 
         </div>
 
@@ -140,49 +154,46 @@ const Dashboard = () => {
 
           {/* TODAY TASKS */}
           <div className="col-lg-8">
-            <div className="dashboard-card  " >
+            <div className="dashboard-card">
               <h6 className="mb-3">Today’s Tasks</h6>
 
               <ul className="task-list">
-                <li>
-                  <input type="checkbox" />
-                  <span>Finish dashboard UI</span>
-                  <small className="badge bg-warning">High</small>
-                </li>
-
-                <li>
-                  <input type="checkbox" defaultChecked />
-                  <span>Review notes content</span>
-                  <small className="badge bg-success">Done</small>
-                </li>
-
-                <li>
-                  <input type="checkbox" />
-                  <span>Plan tomorrow’s tasks</span>
-                  <small className="badge bg-primary">Medium</small>
-                </li>
+                {todayTasks.length ? (
+                  todayTasks.map(task => (
+                    <li key={task._id}>
+                      <input type="checkbox" checked={task.status === "completed"} readOnly />
+                      <span>{task.title}</span>
+                      <small className="badge bg-warning">
+                        {task.priority}
+                      </small>
+                    </li>
+                  ))
+                ) : (
+                  <p>No tasks for today</p>
+                )}
               </ul>
             </div>
           </div>
 
           {/* RECENT NOTES */}
           <div className="col-lg-4">
-            <div className="dashboard-card ">
+            <div className="dashboard-card">
               <h6 className="mb-3">Recent Notes</h6>
 
-              <div className="note-item">
-                <h6>Meeting Notes</h6>
-                <p>Discussed UI improvements and reminders.</p>
-              </div>
+              {recentNotes.length ? (
+                recentNotes.map(note => (
+                  <div className="note-item" key={note._id}>
+                    <h6>{note.title}</h6>
+                    <p>{note.description.slice(0, 60)}...</p>
+                  </div>
+                ))
+              ) : (
+                <p>No recent notes</p>
+              )}
 
-              <div className="note-item">
-                <h6>Ideas</h6>
-                <p>Dark mode, recurring tasks, cloud sync.</p>
-              </div>
-
-              <a href="#" className="view-all">
+              <Link to="/notes" className="view-all">
                 View all notes →
-              </a>
+              </Link>
             </div>
           </div>
 

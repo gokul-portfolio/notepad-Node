@@ -17,8 +17,10 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
     const priority = task.priority || "Medium";
 
     const handleDelete = () => {
+        
         toast(
             ({ closeToast }) => (
+
                 <ConfirmPopup
                     message="Are you sure you want to delete this task?"
                     confirmText="Delete"
@@ -93,7 +95,7 @@ const TaskCard = ({ task, onDelete, onEdit }) => {
             </div>
 
             {/* Actions */}
-            <div className="task-actions d-flex flex-column gap-2">
+            <div className="task-actions  gap-2">
                 {task.attachment && (
                     <Button
                         variant="light"

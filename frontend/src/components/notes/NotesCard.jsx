@@ -44,7 +44,7 @@ const NotesCard = ({ note }) => {
     };
 
     return (
-        <div className="note-card note-card--low">
+        <div className="note-card flex-full note-card--low">
             <div className="note-card__header">
                 <h3 className="note-card__title">{title}</h3>
                 <span className="note-card__category">{category}</span>
